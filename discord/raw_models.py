@@ -22,6 +22,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+from .enums import ChannelType, try_enum
+
 __all__ = (
     'RawMessageDeleteEvent',
     'RawBulkMessageDeleteEvent',
@@ -30,6 +32,7 @@ __all__ = (
     'RawReactionClearEvent',
     'RawReactionClearEmojiEvent',
     'RawIntegrationDeleteEvent',
+    'RawThreadDeleteEvent',
 )
 
 class _RawReprMixin:
@@ -249,3 +252,31 @@ class RawIntegrationDeleteEvent(_RawReprMixin):
             self.application_id = int(data['application_id'])
         except KeyError:
             self.application_id = None
+
+class RawThreadDeleteEvent(_RawReprMixin):
+    """Represents the payload for a :func:`on_raw_thread_delete` event.
+
+    .. versionadded:: 2.0
+
+    Attributes
+    ----------
+    thread_id: :class:`int`
+        The ID of the thread that was deleted.
+    thread_type: :class:`discord.ChannelType`
+        The channel type of the deleted thread.
+    guild_id: :class:`int`
+        The ID of the guild the thread was deleted in.
+    parent_id: :class:`int`
+        The ID of the channel the thread was belonged to.
+    thread: Optional[:class:`discord.Thread`]
+        The thread, if it could be found in the internal cache.
+    """
+
+    __slots__ = ('thread_id', 'thread_type', 'parent_id', 'guild_id', 'thread')
+
+    def __init__(self, data):
+        self.thread_id = int(data['id'])
+        self.thread_type = try_enum(ChannelType, data['type'])
+        self.guild_id = int(data['guild_id'])
+        self.parent_id = int(data['parent_id'])
+        self.thread = None
