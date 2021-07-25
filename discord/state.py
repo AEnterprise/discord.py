@@ -748,6 +748,7 @@ class ConnectionState:
         thread = Thread(guild=guild, state=guild._state, data=data)
         has_thread = guild.get_thread(thread.id)
         guild._add_thread(thread)
+        self.dispatch('raw_thread_create', thread)
         if not has_thread:
             self.dispatch('thread_join', thread)
 
@@ -760,6 +761,7 @@ class ConnectionState:
 
         thread_id = int(data['id'])
         thread = guild.get_thread(thread_id)
+        self.dispatch('raw_thread_update', thread)
         if thread is not None:
             old = copy.copy(thread)
             thread._update(data)
