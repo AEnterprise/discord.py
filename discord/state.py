@@ -868,6 +868,7 @@ class ConnectionState:
                 member = thread._pop_member(member_id)
                 if member is not None:
                     self.dispatch('thread_member_remove', member)
+                self.dispatch('raw_thread_member_remove', thread, member_id)
             else:
                 self.dispatch('thread_remove', thread)
 
